@@ -37,7 +37,7 @@ class Home extends BaseController
         return view('main', $data);
     }
 
-    public function seasons(): string
+    public function seasons()
     {
         $data['seasons'] = $this->season
             ->orderBy('start', 'DESC')
