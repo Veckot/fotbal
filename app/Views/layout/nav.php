@@ -18,7 +18,7 @@
                     <?= anchor("admin", "Admin Panel", ['class' => 'nav-link text-primary fw-bold px-3 py-2 rounded hover-effect']); ?>
                 </li>
                 <li class="nav-item">
-                    <?= anchor("tabs", "Tabs", ['class' => 'nav-link text-primary fw-bold px-3 py-2 rounded hover-effect']); ?>
+                    <?= anchor("seasons", "Sez0ny", ['class' => 'nav-link text-primary fw-bold px-3 py-2 rounded hover-effect']); ?>
                 </li>
             </ul>
         </div>

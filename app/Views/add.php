@@ -66,16 +66,15 @@
 
 <div class="form-container">
     <!-- Title spanning the entire container -->
-    <div class="form-title">Edit Article</div>
+    <div class="form-title">Add Article</div>
 
     <div class="container mt-4">
-        <form action="<?= base_url('update_article') ?>" method="post">
-            <input type="hidden" name="id_a" value="<?= $article->id ?>" />
-            <input type="hidden" name="_method" value="PUT" />
-            
+    <form action="<?= base_url('addNew') ?>" method="post">
+            <!-- No id or _method for creating new article -->
+
             <!-- Link Field -->
             <div class="input-group mt-2">
-                <span class="input-group-text">article/<?= $article->id ?>-</span>
+                <span class="input-group-text">article/</span>
                 <div class="form-floating">
                     <input
                         class="form-control"
@@ -83,29 +82,31 @@
                         name="link"
                         id="link"
                         placeholder="Enter article link"
-                        value="<?= str_replace("article/" . $article->id . "-", "", $article->link) ?>" />
+                        value="" />
                     <label for="link" class="form-label">Article Link</label>
                 </div>
             </div>
 
             <!-- Title Field -->
             <div class="form-floating mt-2">
-                <input class="form-control" type="text" name="title" id="title" required placeholder="Title" value="<?= $article->title ?>">
+                <input class="form-control" type="text" name="title" id="title" placeholder="Title" value="">
                 <label for="title">Title</label>
+            </div>
+
+            <!-- ID Field -->
+            <div class="form-floating mt-2">
+                <input class="form-control" type="text" name="id_a" id="id_a" placeholder="ID" value="">
+                <label for="id_a">ID</label>
             </div>
 
             <!-- Photo Field -->
             <div class="form-floating mt-2">
                 <div class="input-group">
-                    <input class="form-control" type="text" name="photo" id="photo" required value="<?= $article->photo ?>">
+                    <input class="form-control" type="text" name="photo" id="photo" value="">
                     <input class="form-control" type="file" id="photo_file" accept="image/*">
                 </div>
                 <label for="photo">Photo</label>
-                <div id="photo_preview" class="mt-2">
-                    <?php if (!empty($article->photo)): ?>
-                        <img src="<?= esc($article->photo) ?>" style="max-width:200px;">
-                    <?php endif; ?>
-                </div>
+                <div id="photo_preview" class="mt-2"></div>
             </div>
 
             <!-- Date Field -->
@@ -115,9 +116,8 @@
                     type="date"
                     name="date"
                     id="date"
-                    required
                     placeholder="Date"
-                    value="<?= date('Y-m-d', $article->date) ?>">
+                    value="<?= date('Y-m-d') ?>">
                 <label for="date">Date</label>
             </div>
 
@@ -131,7 +131,7 @@
                         </div>
                         <div>
                             <input type="hidden" name="top" value="0">
-                            <input class="form-check-input" type="checkbox" name="top" id="top" value="1" <?= $article->top == 1 ? 'checked' : '' ?>>
+                            <input class="form-check-input" type="checkbox" name="top" id="top" value="1">
                         </div>
                     </div>
                 </div>
@@ -143,7 +143,7 @@
                         </div>
                         <div>
                             <input type="hidden" name="published" value="0">
-                            <input class="form-check-input" type="checkbox" name="published" id="published" value="1" <?= $article->published == 1 ? 'checked' : '' ?>>
+                            <input class="form-check-input" type="checkbox" name="published" id="published" value="1">
                         </div>
                     </div>
                 </div>
@@ -156,7 +156,7 @@
                     name="text"
                     id="text"
                     placeholder="Text"
-                    style="height: 150px;"><?= $article->text ?></textarea>
+                    style="height: 150px;"></textarea>
             </div>
 
             <!-- (duplicate Published switch removed) -->
@@ -164,17 +164,18 @@
             <!-- Submit Button -->
             <div class="row mt-3">
                 <div class="col-12 text-end">
-                    <button type="submit" class="btn btn-primary">Update Article</button>
+                    <button type="submit" class="btn btn-primary">Add New Article</button>
                 </div>
             </div>
-        </form>
+    </form>
     </div>
 </div>
 
 <!-- Include CKEditor 5 Script -->
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 <script>
-    // Initialize CKEditor 5 for the 'text' field
+    // Initialize CKEditor 5 for the 'text' field and keep a reference to the editor
+    let articleEditor = null;
     ClassicEditor
         .create(document.querySelector('#text'), {
             toolbar: [
@@ -194,24 +195,32 @@
             simpleUpload: {
                 uploadUrl: "<?= base_url('uploadImage') ?>",
                 headers: {
-                    // CSRF header if needed
+                    // Add any custom headers here if needed (e.g. CSRF token)
                 }
             }
         })
         .then(editor => {
-            // Copy editor data into textarea on submit
-            const form = document.querySelector('form');
-            if (form) {
-                form.addEventListener('submit', function () {
-                    const textarea = document.querySelector('#text');
-                    if (textarea && editor) textarea.value = editor.getData();
-                });
-            }
+            articleEditor = editor;
         })
         .catch(error => {
             console.error(error);
         });
-    
+
+    // Copy CKEditor data into the textarea before the form submits so
+    // HTML5 'required' validation won't be blocked and the server receives the content.
+    (function () {
+        const form = document.querySelector('form');
+        if (!form) return;
+
+        form.addEventListener('submit', function (e) {
+            const textarea = document.querySelector('#text');
+            if (articleEditor && textarea) {
+                textarea.value = articleEditor.getData();
+            }
+            // allow normal submit to proceed
+        });
+    })();
+
     // Upload selected photo file and set the photo input to the returned URL
     (function () {
         const fileInput = document.querySelector('#photo_file');
