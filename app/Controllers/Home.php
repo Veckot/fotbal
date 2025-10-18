@@ -46,6 +46,16 @@ class Home extends BaseController
         return view('seasons', $data);
     }
 
+    public function season($idSeason)
+    {
+        $data['league_seasons'] = $this->league_season
+            ->where('id_season', $idSeason)
+            ->orderBy('id', 'DESC')
+            ->findAll();
+
+        return view('league_season', $data);
+    }
+
     public function article($idArticle)
     {
         $data['article'] = $this->article

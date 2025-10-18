@@ -12,8 +12,7 @@
                     <?php
                     $start = $season->start;
                     $finish = $season->finish;
-                    echo($start . " - " . $finish);
-                    echo anchor("article/" . $article[0]->id, $title = $article[0]->title);
+                    echo anchor("season/" . $season->id, $title = $start." - ".$finish);
                     ?>
                 </div>
             </div>

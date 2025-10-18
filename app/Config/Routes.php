@@ -12,6 +12,7 @@ $routes->get('edit/(:num)', 'Home::edit/$1');
 $routes->get('create', 'Home::create');
 $routes->get('addnewarticle', 'Home::add');
 $routes->get('seasons', 'Home::seasons');
+$routes->get('season/(:num)', 'Home::season/$1');
 
 $routes->post('addNew', 'Home::addNew');
 $routes->post('uploadImage', 'Home::uploadImage');
